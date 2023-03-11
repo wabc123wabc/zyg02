@@ -1,0 +1,157 @@
+<html lang="zh-CN">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="utf-8" />
+    <title>我的起始页</title>
+    <meta name="description" content="记录和提醒当前最重要的事，可以设置为浏览器起始页tab" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-image: url("https://ts1.cn.mm.bing.net/th/id/R-C.9c69635e07b0a02b13176c43aa8179ab?rik=gLYNeD2%2fmbK6KA&riu=http%3a%2f%2fimg.mm4000.com%2ffile%2f0%2f7b%2f653795eca2.jpg&ehk=Br3h8u%2fVrZpEH63rUOu0FQuOvn6yu1i1kVvbv%2bUGndw%3d&risl=&pid=ImgRaw&r=0");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+        }
+
+        .box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #shuRuKuang {
+            border: 0;
+            border-bottom: 2px solid #13c4db;
+            padding: 4px 2px;
+            display: block;
+            background: 0;
+            line-height: 1.5;
+            outline: none;
+            text-align: center;
+            transition: border-color 0.2s ease-in-out;
+            border-radius: 0;
+            color: #f5e504;
+            font-size: 2rem;
+            max-width: 90%;
+        }
+
+        #anNiu {
+            margin-left: -50px;
+            margin-right: 10px;
+            color: #0de218;
+            border-radius: 50%;
+            height: 40px;
+            width: 40px;
+            text-align: center;
+            line-height: 30px;
+            cursor: pointer;
+        }
+
+        input::placeholder {
+            color: #ebdc0f;
+        }
+
+        input::-webkit-input-placeholder {
+            color: #df7a40;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 翻译：输入框占位符为“最重要的事？”样式为“shuRuKuang”,短语容器样式为“anNiu”,鼠标单击时改变参数内容，短语内容当前为“确认” -->
+    <div class="box">
+        <input placeholder="最重要的事？" id="shuRuKuang" />
+        <span id="anNiu" onclick="change()">确认</span>
+    </div>
+    <script>
+        /* 逻辑推理， 设定有事的值为假false，则程序控制改变的细节为
+          ｛通过网页元素获取ID名称为“anNiu”；
+          输入框通过网页元素获取ID名称为“shuRuKuang”;
+         （ 这里用到了window的内置对象函数，我们输入的只是调用函数而已。属于嵌套式应用模式；）；
+          1 如果（youshi）
+          ｛当有事的值=假时，按钮的文字内容为“确认”;输入框边框底部的颜色样式为“#”；
+          输入框的值为空，输入框只读为假；操作系统本地存储移除项目“shi”;}
+          2 否则 youshi为真时；{按钮文本内容为“删除”；输入框边框底部颜色样式为“transparent”；
+          输入框只读为真；操作系统本地存储生成键值对：名称为“shi”,值为输入框的内容；
+          3 设定数据"data'为操作系统本地存储生成的项目：“shi”;如果参数为（data），
+          文档通过“shuRuKuang”获取的ID的值为数据"data'；改变参数()；｝ */
+        let youShi = false;
+
+        function change() {
+            let anNiu = document.getElementById("anNiu");
+            let shuRuKuang = document.getElementById("shuRuKuang");
+
+            if (youShi) {
+                youShi = false;
+                anNiu.innerText = "确认";
+                shuRuKuang.style.borderBottomColor = "#aa";
+                shuRuKuang.value = "";
+                shuRuKuang.readOnly = false;
+                window.localStorage.removeItem("shi");
+                /* fetch("http://localhost:3000/", { method: "DELETE" })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        console.log(data);
+                    }); */
+            } else {
+                youShi = true;
+                anNiu.innerText = "删除";
+                shuRuKuang.style.borderBottomColor = "transparent";
+                shuRuKuang.readOnly = true;
+                window.localStorage.setItem("shi", shuRuKuang.value);
+                /* fetch("http://localhost:3000/" + shuRuKuang.value, { method: "POST", })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        console.log(data);
+                    }); */
+            }
+        } /* 为了使输入框的数据在重启或刷新后仍然存在，我设定输入数据（'shi')保存在本地浏览器,名字为data, */
+        let data = window.localStorage.getItem("shi");
+        if (data) {
+            document.getElementById("shuRuKuang").value = data;
+            change();
+        }
+        /* 原先我增删改查数据，是调用网络通信fetch给后端服务。后端对请求来的数据进行判断后，
+          再调用FS函数增删改查实际的文件数据。
+          这样的话、前端酒不会直接操作数据库，在保证安全的情况下，完成了数据的统一存取。
+          那如果把fs函数换成数据库函数，也完全可以，道理相同。
+          数据库可以理解为提供更强大的性能和功能的文件系统，这时候用其他浏览器打开网页，发现数据全部是同步的。
+           */
+        /* fetch("http://localhost:3000/", { method: "GET" })
+            .then((response) => response.json())
+            .then((jsonData) => {
+                console.log(jsonData);
+                if (jsonData.data) {
+                    document.getElementById("shuRuKuang").value = jsonData.data;
+                    youShi = true;
+                    anNiu.innerText = "删除";
+                    shuRuKuang.style.borderBottomColor = "transparent";
+                    shuRuKuang.readOnly = true;
+                } 
+            });*/
+    </script>
+
+    <!-- 整体逻辑过程为 
+1 建立输入框项 组合短语确认删除项，具有输入和保存删除功能的选项。
+2 声明变量“youshi"初始为假"false";
+3 程序控制为：按通过网页元素获取ID名称为“anNiu”；
+             输入框通过网页元素获取ID名称为“shuRuKuang”;
+4 条件设立 如果函数参数为(youShi)时执行{}内逻辑判断输出结果，实现相应功能；
+           否则执行{}内逻辑判断输出结果，实现相应功能；-->
+</body>
+
+</html>
